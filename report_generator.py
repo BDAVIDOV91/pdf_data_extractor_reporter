@@ -9,8 +9,10 @@ def save_report(text: str, filename: str, output_dir="output_reports"):
         os.makedirs(output_dir)
     
     filepath = os.path.join(output_dir, filename)
-    
-    with open(filepath, "w", encoding="utf-8") as f:
-        f.write(text)
-    
-    print(f"Report saved successfully: {filepath}")
+
+    try:
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write(text)
+        print(f"Report saved successfully: {filepath}")
+    except Exception as e:
+        print(f"Error saving report: {e}")
