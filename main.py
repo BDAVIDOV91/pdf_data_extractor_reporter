@@ -1,6 +1,8 @@
 from extractor import extract_text_from_pdf
 from report_generator import save_report
 from utils import extract_invoice_data
+from report_generator import save_parsed_to_csv
+
 
 if __name__ == "__main__":
     sample_pdf = "samples/sample.pdf"
@@ -19,5 +21,6 @@ if __name__ == "__main__":
         print("\nParsed invoice data:")
         print("-" * 50)
         print(parsed_data)
+        save_parsed_to_csv(parsed_data, "invoices.csv")
     else:
         print("No text could be extracted from the PDF.")
