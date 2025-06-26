@@ -36,3 +36,24 @@ def save_parsed_to_csv(data: dict, filename: str, output_dir="output_reports"):
         df.to_csv(filepath, mode='a', index=False, header=False)
 
     print(f"Parsed data saved to CSV: {filepath}")
+
+def save_parsed_to_excel(parsed_data: dict, filename: str, output_dir="output_reports"):
+    """
+    Appends the parsed invoice data to an Excel file. Creates it if it doesn't exist.
+    """
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    
+    filepath = os.path.join(output_dir, filename)
+
+    df_new = pd.DataFrame([parsed_data])  # Convert dict to one-row DataFrame
+
+    if os.path.exists(filepath):
+        # Append to existing Excel file
+        existing_df = pd.read_excel(filepath)
+        combined_df = pd.concat([existing_df, df_new], ignore_index=True)
+    else:
+        combined_df = df_new
+
+    combined_df.to_excel(filepath, index=False)
+    print(f"Parsed data saved to Excel: {filepath}")

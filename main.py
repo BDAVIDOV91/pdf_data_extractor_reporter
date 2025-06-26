@@ -2,6 +2,8 @@ import os
 from extractor import extract_text_from_pdf
 from report_generator import save_report, save_parsed_to_csv
 from utils import extract_invoice_data
+from report_generator import save_parsed_to_excel
+
 
 INPUT_FOLDER = "input_pdfs"
 
@@ -29,5 +31,7 @@ if __name__ == "__main__":
 
                 # Save to CSV
                 save_parsed_to_csv(parsed_data, "invoices.csv")
+                save_parsed_to_excel(parsed_data, "invoices.xlsx")
+
             else:
                 print(f"Could not extract text from {pdf_file}")
