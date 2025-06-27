@@ -1,53 +1,75 @@
 # PDF Data Extractor & Reporter
 
-This Python project extracts text from PDF files and saves it in a structured text format for review, storage, or reporting. It is designed to help professionals—such as accountants, auditors, or researchers—quickly extract and save information from documents.
+This Python project extracts text and structured data from PDF files (e.g. invoices), and exports it to `.txt`, `.csv`, and `.xlsx` formats. It is designed to help professionals—such as accountants, auditors, or researchers—quickly extract, review, and archive document information.
 
-## Features
+---
 
-- 📄 Extracts text content from PDF files
-- 📝 Saves extracted text into clean `.txt` reports
-- 📁 Handles missing directories and filenames gracefully
-- 🧩 Modular code (organized in reusable components)
-- 🧪 Ready for command-line use or further extension with a GUI
+## ✅ Features
 
-## Project Structure
+- 📄 Extracts text content from PDF invoices
+- 📁 Batch mode: process all PDFs in `input_pdfs/`
+- 📝 Saves `.txt` reports per file in `output_reports/`
+- 📊 Exports parsed data to `invoices.csv` and `invoices.xlsx`
+- 🧠 Extracts invoice number, date, customer, total, VAT, description
+- 🔒 Handles missing files or directories gracefully
+- 🧩 Modular and extendable codebase
 
-pdf-extractor-project/
+---
+
+## 📁 Project Structure
+
+pdf_data_extractor_reporter/
 │
-├── input_pdfs/ # Place your input PDF files here
-├── output_reports/ # Extracted reports are saved here
-├── samples/ # Example/sample PDFs
+├── input_pdfs/ # Place input PDF files here
+├── output_reports/ # Extracted .txt, .csv, and .xlsx reports
+├── samples/ # Sample/test PDFs
 ├── extractor.py # PDF text extraction logic
-├── report_generator.py # Report saving utility
-├── main.py # Entry point for running the tool
-├── utils.py # (Optional) Utility/helper functions
-├── ui.py # (Optional) GUI-related code (future)
-├── README.md # Project description and usage
-└── .gitignore # Ignores venv, output files, etc.
+├── report_generator.py # Report saving utilities
+├── utils.py # Invoice parsing functions
+├── main.py # Entry script (batch processor)
+├── ui.py # (Optional) GUI logic (future)
+├── README.md # Project documentation
+└── .gitignore # Ignores venv/, pycache, etc.
 
 
-## License
+---
 
-- This project is open-source and free to use.
+## 🚀 How to Use
+
+1. Add your `.pdf` invoices into the `input_pdfs/` folder  
+2. Run the script:
+
+bash
+python3 main.py
+
+
+## Each PDF will be:
+
+- Processed and saved as output_reports/<filename>.txt
+- Parsed data appended to invoices.csv and invoices.xlsx
+
+## Example Output:
+
+- Processing: INV1002.pdf
+- Report saved successfully: output_reports/INV1002.txt
+- Parsed data saved to CSV: output_reports/invoices.csv
+- Parsed data saved to Excel: output_reports/invoices.xlsx
+
+
+## Requirements
+- Python 3.7+
+- pdfplumber
+- pandas
+- openpyxl
+
+
+## Install all with:
+- pip install -r requirements.txt
 
 ## Future Improvements
 
 - Add graphical user interface (GUI)
-
-- Extract metadata or tables
-
-- Support batch PDF processing
-
-- Export to formats like CSV or JSON
-
-
-## Requirements
-
-- Python 3.7+
-- `PyPDF2` or other supported PDF libraries
-
-Install dependencies:
-
-```bash
-pip install -r requirements.txt
-
+- Detect and adapt to multiple invoice formats
+- Handle scanned PDFs (OCR support)
+- Add CLI menu for user-friendly interaction
+- Export to JSON
