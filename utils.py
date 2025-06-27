@@ -2,31 +2,49 @@ import re
 
 def extract_invoice_data(text):
     """
-    Extracts basic invoice data from a block of text using regex.
-    Returns a dictionary with the results.
+    Extracts invoice data using flexible patterns and optional matching.
     """
-    data = {}
+    def find_pattern(patterns, text):
+        for pattern in patterns:
+            match = re.search(pattern, text, re.IGNORECASE)
+            if match:
+                return match.group(1).strip()
+        return None
 
-    # Adjust these patterns to match the structure of your PDFs
-    invoice_number = re.search(r'Invoice\s*(No)?[:\-]?\s*(\w+)', text, re.IGNORECASE)
-    date = re.search(r'Date[:\-]?\s*(\d{2}[./-]\d{2}[./-]\d{4})', text)
-    total = re.search(r'Total[:\-]?\s*\$?(\d+\.\d{2})', text)
-    vat = re.search(r'VAT[:\-]?\s*\$?(\d+\.\d{2})', text)
-    customer = re.search(r'Customer[:\-]?\s*(.*)', text) 
-    description = re.search(r'Description[:\-]?\s*(.+?)(\n|$)', text)
+    invoice_number = find_pattern([
+        r"Invoice\s*No[:\-]?\s*(\w+)",
+        r"Inv(?:oice)?\s*#[:\-]?\s*(\w+)",
+        r"Number[:\-]?\s*(\w+)"
+    ], text)
 
+    date = find_pattern([
+        r"Date[:\-]?\s*([0-9]{2}/[0-9]{2}/[0-9]{4})",
+        r"Issued on[:\-]?\s*([0-9]{2}/[0-9]{2}/[0-9]{4})"
+    ], text)
 
-    if invoice_number:
-        data['invoice_number'] = invoice_number.group(2)
-    if date:
-        data['date'] = date.group(1)
-    if total:
-        data['total'] = total.group(1)
-    if vat:
-        data['vat'] = vat.group(1)
-    if customer:
-        data['customer'] = customer.group(1).strip()
-    if description:
-        data['description'] = description.group(1).strip()
+    total = find_pattern([
+        r"Total[:\-]?\s*([\d.,]+)",
+        r"Amount Due[:\-]?\s*([\d.,]+)"
+    ], text)
 
-    return data
+    vat = find_pattern([
+        r"(?:VAT|Tax|Value Added Tax)[:\-]?\s*([\d.,]+)"
+    ], text)
+
+    customer = find_pattern([
+        r"Customer[:\-]?\s*([^\n\r]+)",
+        r"Billed To[:\-]?\s*([^\n\r]+)"
+    ], text)
+
+    description = find_pattern([
+        r"Description[:\-]?\s*(.+?)(?:\n|$)"
+    ], text)
+
+    return {
+        "invoice_number": invoice_number or "Not found",
+        "date": date or "Not found",
+        "total": total or "Not found",
+        "vat": vat or "Not found",
+        "customer": customer or "Not found",
+        "description": description or "Not found"
+    }

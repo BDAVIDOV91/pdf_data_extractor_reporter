@@ -39,9 +39,7 @@ pdf_data_extractor_reporter/
 1. Add your `.pdf` invoices into the `input_pdfs/` folder  
 2. Run the script:
 
-bash
 python3 main.py
-
 
 ## Each PDF will be:
 
@@ -65,6 +63,26 @@ python3 main.py
 
 ## Install all with:
 - pip install -r requirements.txt
+
+
+## Batch Mode – Process Multiple PDFs
+- To process all PDF files inside the input_pdfs/ directory in one run:
+
+python3 main.py
+
+## The script will:
+
+- Extract text from each PDF
+
+- Save the extracted content as .txt files in output_reports/
+
+- Parse invoice data (invoice number, date, total, VAT, etc.)
+
+- Save structured data to both invoices.csv and invoices.xlsx
+
+- Ensure your PDFs are placed inside the input_pdfs/ folder before running.
+
+
 
 ## Future Improvements
 
