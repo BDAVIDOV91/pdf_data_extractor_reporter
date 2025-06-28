@@ -91,3 +91,9 @@ python3 main.py
 - Handle scanned PDFs (OCR support)
 - Add CLI menu for user-friendly interaction
 - Export to JSON
+
+## Notes
+
+- The extractor saves the total amount even if currency is missing (marked as "Not found").
+- If currency is not specified explicitly in the invoice text, it will not be inferred automatically.
+- Users are encouraged to review output reports and fill missing currency manually if needed.
