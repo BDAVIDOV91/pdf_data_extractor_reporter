@@ -2,75 +2,54 @@ import re
 
 def extract_invoice_data(text):
     """
-    Enhanced invoice data extraction.
-    - Keeps total even if currency is missing.
-    - Uses stricter keywords and fallback logic.
+    Extract invoice data with fallback logic and more flexible regex patterns.
     """
-    lines = text.splitlines()
+    data = {}
 
-    invoice_number = None
-    date = None
-    client = None
-    description = "N/A"
-    total = None
-    vat = None
-    currency = None
+    # Invoice number
+    invoice_number = re.search(r"Invoice[\s:]*([0-9]{4,})", text, re.IGNORECASE)
+    if not invoice_number:
+        invoice_number = re.search(r"№\s*(\d+)", text)
+    data["invoice_number"] = invoice_number.group(1) if invoice_number else "Not found"
 
-    # --------- Client detection ---------
-    for line in lines[:15]:
-        if re.search(r"(Company Name|Получател|Client|Billed To)", line, re.IGNORECASE):
-            match = re.search(r"(?:Company Name|Получател|Client|Billed To)[:\-]?\s*(.*)", line, re.IGNORECASE)
-            if match:
-                client = match.group(1).strip()
-                break
-        if re.search(r"(Ltd|ЕООД|ООД|АД)", line):
-            client = line.strip()
-            break
+    # Date
+    date = re.search(r"Date[\s:]*([\d]{2}\.[\d]{2}\.[\d]{4})", text)
+    if not date:
+        date = re.search(r"(\d{2}\.\d{2}\.\d{4})", text)
+    data["date"] = date.group(1) if date else "Not found"
 
-    # --------- Invoice number and date ---------
-    for line in lines[:20]:
-        if re.search(r"(Invoice\s*No|Фактура\s*№|Inv\s*#|No[:\-]?)", line, re.IGNORECASE):
-            num_match = re.search(r"(?:Invoice\s*No|Фактура\s*№|Inv\s*#|No[:\-]?)\s*(\d+)", line, re.IGNORECASE)
-            if num_match:
-                invoice_number = num_match.group(1).strip()
-        if re.search(r"(Date|Дата|Issued on)", line, re.IGNORECASE):
-            date_match = re.search(r"([0-9]{2}[./\-][0-9]{2}[./\-][0-9]{4})", line)
-            if date_match:
-                date = date_match.group(1).strip()
+    # Client
+    client = re.search(r"Company Name[:\s]*(.*?)(\n|$)", text, re.IGNORECASE)
+    if not client:
+        client = re.search(r"Customer[:\s]*(.*?)(\n|$)", text, re.IGNORECASE)
+    data["client"] = client.group(1).strip() if client else "Not found"
 
-    # --------- Totals (bottom-up) ---------
-    for line in reversed(lines):
-        if re.search(r"(Total|Общо|Amount Due|Grand Total|Amount)", line, re.IGNORECASE):
-            total_match = re.search(r"([\d.,]+)", line)
-            currency_match = re.search(r"(EUR|BGN|USD)", line)
-            if total_match:
-                total = total_match.group(1).strip()
-            if currency_match:
-                currency = currency_match.group(1).strip()
-            break
+    # Description
+    desc = re.search(r"Description[\s:]*([\w\s\-.,]*)", text, re.IGNORECASE)
+    data["description"] = desc.group(1).strip() if desc and desc.group(1).strip() else "N/A"
 
-    # --------- VAT (bottom-up) ---------
-    for line in reversed(lines):
-        if re.search(r"(VAT|ДДС|Tax)", line, re.IGNORECASE) and re.search(r"[\d.,]+", line):
-            vat_match = re.search(r"([\d.,]+)", line)
-            if vat_match:
-                vat = vat_match.group(1).strip()
-                break
+    # Total
+    total = re.search(r"Total[\s:]*([\d.,]+)", text, re.IGNORECASE)
+    if not total:
+        total = re.search(r"Amount Due[\s:]*([\d.,]+)", text, re.IGNORECASE)
+    if total:
+        value = total.group(1).replace(",", ".").strip()
+        data["total"] = value if value else "Not found"
+    else:
+        data["total"] = "Not found"
 
-    # --------- Description ---------
-    for line in lines:
-        if re.search(r"(Description|Описание)", line, re.IGNORECASE):
-            desc_match = re.search(r"(?:Description|Описание)[:\-]?\s*(.*)", line, re.IGNORECASE)
-            if desc_match and len(desc_match.group(1).strip()) > 3:
-                description = desc_match.group(1).strip()
-                break
+    # VAT
+    vat = re.search(r"VAT[\s:]*([\d.,]+)", text, re.IGNORECASE)
+    data["vat"] = vat.group(1).replace(",", ".") if vat else "Not found"
 
-    return {
-        "invoice_number": invoice_number or "Not found",
-        "date": date or "Not found",
-        "client": client or "Not found",
-        "description": description or "N/A",
-        "total": total or "Not found",
-        "vat": vat or "Not found",
-        "currency": currency or "Not found"
-    }
+    # Currency
+    currency = re.search(r"(BGN|EUR|USD|GBP)", text)
+    data["currency"] = currency.group(1) if currency else "Not found"
+
+    # Validate suspicious values
+    if data["vat"] and (len(data["vat"]) < 1 or not re.match(r"^\d+(\.\d+)?$", data["vat"])):
+        data["vat"] = "Invalid"
+    if data["total"] and (len(data["total"]) < 1 or not re.match(r"^\d+(\.\d+)?$", data["total"])):
+        data["total"] = "Invalid"
+
+    return data
