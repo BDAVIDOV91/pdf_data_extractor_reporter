@@ -4,68 +4,59 @@ This project automates extracting text and structured invoice data from PDF file
 
 ## Features
 
-- Extracts text from PDF invoices
-- Flexible regex logic with fallback to handle different invoice formats
-- Batch processing of multiple PDFs from `input_pdfs/` folder
-- Exports parsed data to CSV and Excel
-- Logs all parsed results to `logs/extraction_log.txt`
-- Modular structure, ready for CLI or GUI extension
+- Extract text from PDF invoices
+- Parse important invoice data:
+  - Invoice number
+  - Date
+  - Client
+  - Description (detailed item list)
+  - Total
+  - VAT
+  - Currency
+- Generate detailed text reports
+- Export all parsed data into a cumulative CSV and Excel file
+- Log all parsing operations and results to a separate log file
 
 ## Project Structure
 
-- input_pdfs/ # Your PDF files
-- output_reports/ # Text reports, CSV, Excel
-- logs/ # Extraction logs
-- samples/ # Example PDFs
-- extractor.py # PDF extraction logic
-- utils.py # Parsing logic and helpers
-- report_generator.py # Save functions
-- main.py # Main runner script
-- README.md
+- input_pdfs/
+    Your PDF invoices here
+- output_reports/
+    Your generated reports and CSV/Excel
+- logs/
+    extraction_log.txt
+- main.py
+- extractor.py
+- utils.py
+- report_generator.py
 - requirements.txt
-
-## Installation
-
-- pip install -r requirements.txt
-
-## Each PDF will be:
-
-- Processed and saved as output_reports/<filename>.txt
-- Parsed data appended to invoices.csv and invoices.xlsx
-
-## Batch Mode – Process Multiple PDFs
-
-- To process all PDF files inside the input_pdfs/ directory in one run:
-- python3 main.py
+- README.md
 
 ## Requirements
 
-- Python 3.7+
-- PyPDF2
-- pdfminer.six
-- pdfplumber
-- pandas
-- openpyxl
+- Python 3.8 or higher (tested on 3.8)
+- Install required packages:
 
-## The script will:
+- pip install -r requirements.txt
 
-- Extract text from each PDF
-- Save the extracted content as .txt files in output_reports/
-- Parse invoice data (invoice number, date, total, VAT, etc.)
-- Save structured data to both invoices.csv and invoices.xlsx
-- Ensure your PDFs are placed inside the input_pdfs/ folder before running.
+## Logging
+- All operations, including start and completion of each file and any errors, are logged in logs/extraction_log.txt. This helps with tracking the process and debugging potential parsing issues
 
 ## Future Improvements
 
-- CLI or GUI options
-- OCR for scanned invoices
-- Client-specific templates
+- Improve client and invoice number detection using better patterns.
+- Add OCR support for scanned or image-based invoices (e.g., Tesseract).
+- Add CLI options for more flexible batch runs (e.g., choose output formats, set custom output folder).
+- Add support for more invoice layouts and formats.
+- Add logging improvements (e.g., summary log at the end).
+- Add optional web or GUI interface (consider in the future).
 
 ## License
+
 - Open-source, free to use.
 
 ## Notes
 
-- The extractor saves the total amount even if currency is missing (marked as "Not found").
-- If currency is not specified explicitly in the invoice text, it will not be inferred automatically.
-- Users are encouraged to review output reports and fill missing currency manually if needed.
+- The extractor will save the total amount even if the currency is missing (marked as "Not found").
+- If the currency is not explicitly specified in the invoice text, it will not be inferred automatically.
+- Users should review the output reports and manually correct or fill in any missing currency if needed.
